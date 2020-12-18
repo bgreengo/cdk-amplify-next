@@ -50,5 +50,80 @@ export class NextBackendStack extends cdk.Stack {
         }]
       }
     })
+    const postLambda = new lambda.Function(this, 'AppSyncPost', {
+      runtime: lambda.Runtime.NODEJS_12_X,
+      handler: 'main.handler',
+      code: lambda.Code.fromAsset('lambda-fns'),
+      memorySize: 1024
+    })
+    const lambdaDs = api.addLambdaDataSource('lambdaDatasource', postLambda)
+    lambdaDs.createResolver({
+      typeName: "Query",
+      fieldName: "getPostById"
+    })
+    
+    lambdaDs.createResolver({
+      typeName: "Query",
+      fieldName: "listPosts"
+    })
+    
+    lambdaDs.createResolver({
+      typeName: "Query",
+      fieldName: "postsByUsername"
+    })
+    
+    lambdaDs.createResolver({
+      typeName: "Mutation",
+      fieldName: "createPost"
+    })
+    
+    lambdaDs.createResolver({
+      typeName: "Mutation",
+      fieldName: "deletePost"
+    })
+    
+    lambdaDs.createResolver({
+      typeName: "Mutation",
+      fieldName: "updatePost"
+    })
+
+    const postTable = new ddb.Table(this, 'cdkpostTable', {
+      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
+      partitionKey: {
+        name: 'id',
+        type: ddb.AttributeType.STRING,
+      },
+    })
+
+    postTable.addGlobalSecondaryIndex({
+      indexName: "postsByUsername",
+      partitionKey: {
+        name: "owner",
+        type: ddb.AttributeType.STRING,
+      }
+    })
+    postTable.grantFullAccess(postLambda)
+
+    postLambda.addEnvironment('POST_TABLE', postTable.tableName)
+
+    new cdk.CfnOutput(this, "GraphQLAPIURL", {
+      value: api.graphqlUrl
+    })
+    
+    new cdk.CfnOutput(this, 'AppSyncAPIKey', {
+      value: api.apiKey || ''
+    })
+    
+    new cdk.CfnOutput(this, 'ProjectRegion', {
+      value: this.region
+    })
+    
+    new cdk.CfnOutput(this, "UserPoolId", {
+      value: userPool.userPoolId
+    })
+    
+    new cdk.CfnOutput(this, "UserPoolClientId", {
+      value: userPoolClient.userPoolClientId
+    })
   }
 }
