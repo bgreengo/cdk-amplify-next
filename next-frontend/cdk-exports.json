@@ -1,0 +1,9 @@
+{
+  "NextBackendStack": {
+    "UserPoolClientId": "5bu07207nampa8o86qco8k6go0",
+    "AppSyncAPIKey": "da2-i47ev6ierra2jlkndpu22lukcy",
+    "UserPoolId": "us-west-2_9BbUzpNYa",
+    "GraphQLAPIURL": "https://hdpxpjfdzbbadof7hudufqcety.appsync-api.us-west-2.amazonaws.com/graphql",
+    "ProjectRegion": "us-west-2"
+  }
+}

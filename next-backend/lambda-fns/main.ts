@@ -19,13 +19,13 @@ type AppSyncEvent = {
    }
 }
 
-exports.handler = async (event:AppSyncEvent) => {
+exports.handler = async (event:AppSyncEvent, context:any) => {
     switch (event.info.fieldName) {
         case "getPostById":
           return await getPostById(event.arguments.postId)
         case "createPost": {
           const { username } = event.identity
-          return await createPost(event.arguments.post, username)
+          return await createPost(event.arguments.post, username, context.awsRequestId)
         }
         case "listPosts":
           return await listPosts()
